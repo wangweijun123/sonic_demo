@@ -108,6 +108,8 @@ public class BrowserActivity extends Activity {
             }
 
             // create sonic session and run sonic flow
+            // 在初始化webview之前 这里会调用 sonicSession.start(); 启动线程池
+            // 他为什么说 sonic线程池与webview的初始化并行
             sonicSession = SonicEngine.getInstance().createSession(url, sessionConfigBuilder.build());
             if (null != sonicSession) {
                 sonicSession.bindClient(sonicSessionClient = new SonicSessionClientImpl());
@@ -122,7 +124,7 @@ public class BrowserActivity extends Activity {
         // start init flow ...
         // in the real world, the init flow may cost a long time as startup
         // runtime、init configs....
-        setContentView(R.layout.activity_browser);
+        setContentView(R.layout.activity_browser); // 在这里才是去初始化webview
 
         FloatingActionButton btnFab = (FloatingActionButton) findViewById(R.id.btn_refresh);
         btnFab.setOnClickListener(new View.OnClickListener() {
@@ -184,7 +186,7 @@ public class BrowserActivity extends Activity {
 
         // webview is ready now, just tell session client to bind
         if (sonicSessionClient != null) {
-            sonicSessionClient.bindWebView(webView);
+            sonicSessionClient.bindWebView(webView); // sonic模式下会把webview传过去, 让sonic去处理
             sonicSessionClient.clientReady();
         } else { // default mode
             webView.loadUrl(url);

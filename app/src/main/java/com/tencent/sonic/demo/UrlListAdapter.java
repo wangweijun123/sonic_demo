@@ -38,6 +38,8 @@ public class UrlListAdapter extends BaseAdapter {
     public static final int MODE_EDIT = 2;
 
     private static final String DEFAULT_URL = "http://mc.vip.qq.com/demo/indexv3";
+//    private static final String DEFAULT_URL = "https://developer.android.google.cn/guide/topics/ui/custom-components";
+
 
     private ArrayList<String> urls;
     private LayoutInflater mInflater;
