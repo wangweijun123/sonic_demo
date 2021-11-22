@@ -19,6 +19,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Trace;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,6 +34,8 @@ import com.tencent.sonic.R;
 import com.tencent.sonic.sdk.SonicConfig;
 import com.tencent.sonic.sdk.SonicEngine;
 import com.tencent.sonic.sdk.SonicSessionConfig;
+
+import java.lang.reflect.Field;
 
 
 /**
@@ -52,6 +56,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // test hide api
+        hideApiTest();
 
         // full screen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -174,6 +180,40 @@ public class MainActivity extends Activity {
         intent.putExtra(BrowserActivity.PARAM_MODE, mode);
         intent.putExtra(SonicJavaScriptInterface.PARAM_CLICK_TIME, System.currentTimeMillis());
         startActivityForResult(intent, -1);
+    }
+
+    private void hideApiTest() {
+        Class<?> superclass = this.getClass().getSuperclass();
+        Log.i("hidetest", "superclass = " + superclass.getName());
+        Field[] declaredFields = superclass.getDeclaredFields();
+        try {
+            // ANDROID p 以上去那隐藏@hide的api抛出异常 java.lang.NoSuchFieldException: mEnterAnimationComplete
+            Field mEnterAnimationComplete = superclass.getField("mEnterAnimationComplete");
+            mEnterAnimationComplete.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            Log.e("hidetest", "hide mEnterAnimationComplete 不容许反射在p上");
+        }
+        /*for (int i = 0; i < declaredFields.length; i++) { // mEnterAnimationComplete
+            Log.i("hidetest", "field name = " + declaredFields[i].getName());
+            if (declaredFields[i].getName().equals("mEnterAnimationComplete")) {
+                Log.i("hidetest", "################## " + declaredFields[i].getName());
+            }
+        }*/
+
+        //  @UnsupportedAppUsage
+        //    private IBinder mToken;
+        try {
+            // 在 p 上的 NoSuchFieldException
+            Field mEnterAnimationComplete = superclass.getField("mToken");
+            mEnterAnimationComplete.setAccessible(true);
+            mEnterAnimationComplete.get(this);
+        } catch (NoSuchFieldException e) {
+            Log.e("hidetest", "NoSuchFieldException UnsupportedAppUsage filed 不容许反射在p上");
+        }catch (IllegalAccessException e) {
+            Log.e("hidetest", "IllegalAccessException UnsupportedAppUsage filed 不容许反射在p上");
+        }
+        Trace trace;
+
     }
 
 }
